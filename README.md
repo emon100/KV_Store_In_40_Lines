@@ -9,7 +9,7 @@ It's a challenge in [More challenging projects every programmer should try](http
   - DELETE for delete keys.
 - String to string key-value support.
 - Use JSON as representation format.
-- Fault-tolerant when parameters isn't fit method
+- Fault-tolerant when parameters don't fit the HTTP method.
 
 ## Examples
 ```
