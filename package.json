@@ -1,0 +1,11 @@
+{
+  "name": "KV_Store_In_40_Lines",
+  "version": "1.0.0",
+  "description": "A tiny in-memory key value store in 40 lines of code.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "emon100",
+  "license": "BSD"
+}
