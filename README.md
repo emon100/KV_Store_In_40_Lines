@@ -23,7 +23,7 @@ It's a challenge in [More challenging projects every programmer should try](http
 {"committed":true,"data":{"a":"2"}}
 
 > curl -X POST 'http://localhost:8800/?a=2&a=3'
-{"committed":true}
+{"committed":true,"data":{"a":"3"}}
 
 > curl -X GET 'http://localhost:8800/'
 {"committed":true,"data":{"a":"3","b":"3"}{
