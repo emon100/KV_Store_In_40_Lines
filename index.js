@@ -1,39 +1,37 @@
 const http = require("http");
 
 const globalStorage = new Map(), port = 8800;
+function GET(url, resObj) {
+    if (url.search === '') resObj.data = Object.fromEntries(globalStorage);
+    else resObj.data = {}
+    url.searchParams.forEach((_, k) => resObj.data[k] = globalStorage.get(k));
+}
+
+function POST(url, resObj) {
+    resObj.data = {};
+    [...url.searchParams.entries()].filter(v => !!v[1]).forEach(([k, v]) => {
+        resObj.data[k] = v;
+        globalStorage.set(k, v);
+    });
+}
+
+function DELETE(url) {
+    for (const k of url.searchParams.keys()) globalStorage.delete(k);
+}
+
 http.createServer((request, response) => {
-    const responseObj = {};
-    const url = new URL(request.url, `http://${request.headers.host}`);
-    if (request.method === 'GET') {
-        let paramsNotExist = true;
-        for (const e of url.searchParams.keys()) {
-            responseObj[e] = globalStorage.get(e);
-            paramsNotExist = false;
-        }
-        if (paramsNotExist) {
-            globalStorage.forEach((v, k) => {
-                responseObj[k] = v;
-            });
-        }
-    } else if (request.method === 'POST') {
-        for (const e of url.searchParams.entries()) {
-            const valueList = url.searchParams.getAll(e[0]);
-            if (valueList.length === 1)
-                globalStorage.set(e[0], e[1]);
-            else
-                globalStorage.set(e[0], valueList);
-        }
-        responseObj = {committed: true};
-    } else if (request.method === 'DELETE') {
-        for (const e of url.searchParams.keys()) {
-            globalStorage.delete(e);
-        }
-        responseObj = {committed: true};
-    } else {
-        throw request.method + " Not implemented.";
+    const responseObj = {committed: true};
+    const url = new URL(`http://${request.headers.host}\\${request.url}`);
+
+    if (request.method === 'GET') GET(url, responseObj);
+    else if (request.method === 'POST') POST(url, responseObj);
+    else if (request.method === 'DELETE') DELETE(url);
+    else { //Unimplemented HTTP methods
+        responseObj.reason = request.method + " Not implemented.";
+        responseObj.committed = false;
     }
-    response.writeHead(200, {'Content-Type': 'application/json'});
-    response.write(JSON.stringify(responseObj));
-    response.end();
+
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify(responseObj));
 }).listen(port);
 console.log(`http://localhost:${port}`);

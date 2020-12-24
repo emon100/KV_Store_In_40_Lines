@@ -9,24 +9,24 @@ It's a challenge in [More challenging projects every programmer should try](http
   - DELETE for delete keys.
 - String to string key-value support.
 - Use JSON as representation format.
-- Fault-tolerant when parameters don't fit the HTTP method.
+- Fault-tolerant when parameters don't fit the HTTP methods.
 
 ## Examples
 ```
 > curl -X POST 'http://localhost:8800/?a=1&a=2&b=3&c'
-{"committed":true}
+{"committed":true,"data":{"a":"2","b":"3"}}
 
 > curl -X GET 'http://localhost:8800/'
-{"a":["1","2"],"b":"3","c":""}
+{"committed":true,"data":{"b":"3","a":"2"}}
 
-> curl -X GET 'http://localhost:8800/?a&b=1'
-{"a":["1","2"],"b":"3"}
+> curl -X GET 'http://localhost:8800/?a=1'
+{"committed":true,"data":{"a":"2"}}
 
 > curl -X POST 'http://localhost:8800/?a=2&a=3'
 {"committed":true}
 
 > curl -X GET 'http://localhost:8800/'
-{"a":["2","3"],"b":"3","c":""}
+{"committed":true,"data":{"a":"3","b":"3"}{
 ```
 
 ## License
