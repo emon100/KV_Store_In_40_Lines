@@ -2,7 +2,7 @@ const http = require("http");
 const globalStore = new Map(), port = 8800;
 const methods = {
     GET(url, resObj) {
-        if (url.search === '') resObj.data = Object.fromEntries(globalStore);
+        if (!url.search) resObj.data = Object.fromEntries(globalStore);
         else resObj.data = {}
         url.searchParams.forEach((_, k) => resObj.data[k] = globalStore.get(k));
     },
@@ -13,17 +13,17 @@ const methods = {
             globalStore.set(k, v);
         });
     },
-    DELETE:(url)=>[...url.searchParams.keys()].forEach(k=>globalStore.delete(k))
+    DELETE:url=>[...url.searchParams.keys()].forEach(k=>globalStore.delete(k))
 };
 
+function unimplementedMethods(q,s){
+    s.reason=q.method+" Not implemented."; s.committed = false;
+}
 http.createServer((request, response) => {
     const responseObj = {committed: true};
-    const url = new URL(`http://${request.headers.host}\\${request.url}`);
-    if (methods[request.method]) methods[request.method](url, responseObj);
-    else { //Unimplemented HTTP methods
-        responseObj.reason = request.method + " Not implemented.";
-        responseObj.committed = false;
-    }
+    const url = new URL(request.url,`http://${request.headers.host}`);
+    if (request.method in methods) methods[request.method](url, responseObj);
+    else unimplementedMethods(request,response);
     response.setHeader('Content-Type', 'application/json');
     response.end(JSON.stringify(responseObj));
 }).listen(port);
